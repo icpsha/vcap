@@ -67,7 +67,7 @@ beginning and towards the end. The entire process takes ~1 hour, so just
 keep a loose eye on it.
 
      sudo apt-get install curl
-     bash < <(curl -s -k -B https://raw.github.com/cloudfoundry/vcap/master/setup/install)
+     bash < <(curl -s -k -B https://raw.github.com/hsiliev/vcap/virgo/setup/install)
 
 _**Experimental**_ Or, instead of the above steps, try the new Chef based
 installation.  Note: the Chef based setup will eventually replace the
