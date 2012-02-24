@@ -97,6 +97,8 @@ class Service < ActiveRecord::Base
     case self.name
     when /mysql/
       'database'
+    when /maxdb/
+       'database'
     when /postgresql/
       'database'
     when /redis/

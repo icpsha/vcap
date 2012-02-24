@@ -121,6 +121,8 @@ default_account_capacity:
 builtin_services:
   mysql:
     token: "0xdeadbeef"
+  maxdb:
+    token: "0xdeadbeef"
   postgresql:
     token: "0xdeadbeef"
   redis:

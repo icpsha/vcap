@@ -16,6 +16,7 @@
 # - mysql
 # - mongo
 # - neo4j
+# - maxdb
 
 require 'yaml'
 require 'fileutils'
@@ -440,7 +441,7 @@ module Run
   end
 
   def self.services
-    %w(redis mysql mongodb neo4j)
+    %w(redis mysql mongodb neo4j maxdb)
   end
 
   def self.alias_args(args)
