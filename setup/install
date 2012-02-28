@@ -96,7 +96,8 @@ cd ~/cloudfoundry
 [ -d vcap ] || git clone $VCAP_REPO
 cd vcap
 git submodule update --init
-gem install vmc --no-rdoc --no-ri
+# install vmc with virgo
+gem install vmc_virgo --no-rdoc --no-ri
 
 echo "Setting up vcap."
 cd ~/cloudfoundry/vcap
