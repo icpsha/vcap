@@ -1,0 +1,24 @@
+---
+local_db: jdbc:h2:/var/vcap/services/maxdb/maxdb_node.db
+base_dir: /var/vcap/services/maxdb/
+ip_route: 127.0.0.1
+mbus: nats://<%= node[:nats_server][:user] %>:<%= node[:nats_server][:password] %>@<%= node[:nats_server][:host] %>:<%= node[:nats_server][:port] %>/
+index: <%= node[:maxdb_node][:index] %>
+logging:
+  level: debug
+pid: /var/vcap/sys/run/maxdb_node.pid
+available_storage: <%= node[:maxdb_node][:available_storage] %>
+node_id: <%= "maxdb_node_#{node[:maxdb_node][:index]}" %>
+max_db_size: <%= node[:maxdb_node][:max_db_size] %>
+max_log_size: <%= node[:maxdb_node][:max_log_size] %>
+max_user_conns: <%= node[:maxdb_node][:max_user_conn] %>
+migration_nfs: /mnt/migration
+maxdb:
+  sysdbauser: <%= node[:maxdb_node][:sysdbauser] %>
+  sysdbapassword: <%= node[:maxdb_node][:sysdbapassword] %>
+  dbmuser: <%= node[:maxdb_node][:dbmuser] %>
+  dbmpassword: <%= node[:maxdb_node][:dbmpassword] %>
+  osuser: <%= node[:maxdb_node][:osuser] %>
+  ospassword: <%= node[:maxdb_node][:ospassword] %>
+  host: <%= node[:maxdb_node][:host] %>
+  port: 7210
