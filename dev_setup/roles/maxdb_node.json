@@ -1,0 +1,12 @@
+{
+  "name": "maxdb",
+  "override_attributes": {},
+  "json_class": "Chef::Role",
+  "description": "Maxdb database for apps",
+  "chef_type": "role",
+  "run_list" : ["recipe[deployment]",
+                "recipe[essentials]",
+                "recipe[ruby]",
+                "recipe[maxdb]",
+                "recipe[maxdb::node]"]
+}
