@@ -1,11 +1,11 @@
 {
-  "name": "mysql_gateway",
+  "name": "maxdb_gateway",
   "override_attributes": {},
   "json_class": "Chef::Role",
-  "description": "MySQL services gateway",
+  "description": "Maxdb services gateway",
   "chef_type": "role",
   "run_list" : ["recipe[deployment]",
                 "recipe[essentials]",
                 "recipe[ruby]",
-                "recipe[mysql::gateway]"]
+                "recipe[maxdb::gateway]"]
 }
