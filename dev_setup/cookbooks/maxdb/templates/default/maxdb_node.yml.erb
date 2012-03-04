@@ -1,7 +1,7 @@
 ---
 local_db: jdbc:h2:/var/vcap/services/maxdb/maxdb_node.db
 base_dir: /var/vcap/services/maxdb/
-ip_route: 127.0.0.1
+ip_route: <%= node[:local_ip] %>
 mbus: nats://<%= node[:nats_server][:user] %>:<%= node[:nats_server][:password] %>@<%= node[:nats_server][:host] %>:<%= node[:nats_server][:port] %>/
 index: <%= node[:maxdb_node][:index] %>
 logging:

@@ -10,6 +10,6 @@ default[:maxdb_node][:dbmpassword] = "maxdb"
 default[:maxdb_node][:dbmuser] = "root"
 default[:maxdb_node][:sysdbapassword] = "maxdb"
 default[:maxdb_node][:sysdbauser] = "root"
-default[:maxdb_node][:ospassword] = "maxdb"
-default[:maxdb_node][:osuser] = "root"
+default[:maxdb_node][:ospassword] = "sdb"
+default[:maxdb_node][:osuser] = "sdb"
 

@@ -5,7 +5,7 @@
 # Copyright 2011, VMware
 #
 #
-
+node[:local_ip] ||= cf_local_ip
 case node['platform']
   
 when "ubuntu"
@@ -26,7 +26,7 @@ when "ubuntu"
         rm /tmp/source_maxdb.list        
       EOH
     end
-    %w{wx-common libpng3 libtiff4 makepasswd libgtk2.0-0}.each do |p|
+    %w{wx-common libpng3 libtiff4 makepasswd libgtk2.0-0 libshadow-ruby1.8}.each do |p|
       package p do
          action [:install]
       end
