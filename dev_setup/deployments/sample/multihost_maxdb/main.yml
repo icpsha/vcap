@@ -1,0 +1,12 @@
+---
+deployment:
+  name: "rest"
+jobs:
+  install:
+    - nats_server
+    - cloud_controller:
+        builtin_services:
+          - maxdb
+    - health_manager
+    - ccdb
+    - maxdb_gateway

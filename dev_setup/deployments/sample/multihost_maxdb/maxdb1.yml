@@ -1,10 +1,13 @@
 ---
 deployment:
-  name: "maxdb0"
+  name: "maxdb1"
 jobs:
   install:
     - maxdb_node:
-        index: "0"
+        index: "1"
   installed:
     - nats_server:
         host: "172.31.4.13"
+        port: "4222"
+        user: "nats"
+        password: "nats"
