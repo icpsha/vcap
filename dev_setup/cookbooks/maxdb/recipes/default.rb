@@ -26,7 +26,7 @@ when "ubuntu"
         rm /tmp/source_maxdb.list        
       EOH
     end
-    %w{wx-common libpng3 libtiff4 makepasswd libgtk2.0-0 libshadow-ruby1.8}.each do |p|
+    %w{wx-common libpng3 libtiff4 makepasswd libgtk2.0-0 }.each do |p|
       package p do
          action [:install]
       end
@@ -40,7 +40,7 @@ when "ubuntu"
       EOH
     end
   end
-
+  
   bash "Install maxdb" do
     user "root"
     cwd "/tmp"
@@ -55,6 +55,10 @@ when "ubuntu"
       ::File.exists?(File.join("", "opt", "sdb", "globalprograms"))
     end
   end
+  
+ package "libshadow-ruby1.8" do
+   action [:install]
+ end
  
  user "sdb" do
    action :modify

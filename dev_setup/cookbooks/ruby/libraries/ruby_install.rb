@@ -73,8 +73,14 @@ module RubyInstall
     %w[ rack eventmachine thin sinatra mysql pg vmc ].each do |gem|
       gem_package gem do
         gem_binary File.join(ruby_path, "bin", "gem")
-      end
+      end      
     end
+    gem_package "vmc_virgo" do
+      gem_binary File.join(ruby_path, "bin", "gem")
+      options "--pre"
+      source "https://rubygems.org"
+    end
+    
   end
 end
 
