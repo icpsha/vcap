@@ -4,7 +4,7 @@ deployment:
 jobs:
   install:
     - maxdb_node:
-        index: "0"
+         index: "0"
   installed:
     - nats_server:
         host: "172.31.4.13"

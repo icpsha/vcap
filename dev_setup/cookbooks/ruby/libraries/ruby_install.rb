@@ -77,8 +77,8 @@ module RubyInstall
     end
     gem_package "vmc_virgo" do
       gem_binary File.join(ruby_path, "bin", "gem")
-      options "--pre"
-      source "https://rubygems.org"
+      version "0.0.1.beta"
+      options "--pre"      
     end
     
   end
