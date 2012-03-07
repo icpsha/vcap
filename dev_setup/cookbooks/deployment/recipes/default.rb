@@ -58,3 +58,56 @@ file node[:deployment][:local_run_profile] do
     export CLOUD_FOUNDRY_CONFIG_PATH=#{node[:deployment][:config_path]}
   EOH
 end
+
+file node[:deployment][:cf_deployment_start] do
+  owner node[:deployment][:user]
+  group node[:deployment][:group]
+  content <<-EOH
+      #!/usr/bin/env ruby
+      require 'rubygems'
+      require 'json'
+      require 'yaml'
+      require 'uri'
+
+      file = File.open(File.expand_path("/home/ubuntu/.cloudfoundry_deployment_target"), "rb")
+      cf_local_dep = JSON.parse!(file.read)
+      cf_home = cf_local_dep['cloudfoundry_home']
+      local_dep_name = cf_local_dep['deployment_name']
+      config_dir = "\#{cf_home}/.deployments/\#{local_dep_name}/config"
+      public_ip = `wget -qO -  http://169.254.169.254/latest/meta-data/public-ipv4`
+      local_ip = `wget -qO -  http://169.254.169.254/latest/meta-data/local-ipv4`
+      user_data = JSON.parse(`wget -qO -  http://169.254.169.254/latest/user-data`)
+      Dir.chdir(config_dir) do
+        Dir.glob("*.yml").each{|file|
+          comp_config = YAML.load(File.read(file))
+          if !comp_config['local_route'].nil?
+            comp_config['local_route'] = local_ip
+          end
+          if !comp_config['ip_route'].nil?
+            comp_config['ip_route'] = local_ip
+          end
+          mbus = URI.parse(comp_config['mbus'])
+          puts mbus
+          if !mbus.nil? && !user_data.nil?
+            mbus.host = user_data['message_bus']['host']
+            mbus.port = user_data['message_bus']['port'].to_i
+            comp_config['mbus'] = "\#{mbus}"
+          end
+          File.open(file,'w+') {|out|
+            YAML.dump(comp_config,out)
+          }
+        }
+      end
+      exec("sudo \#{cf_home}/vcap/dev_setup/bin/vcap_dev -d \#{cf_home} -n \#{local_dep_name} start")
+
+  EOH
+end
+file node[:deployment][:sample_rc_local] do
+  owner node[:deployment][:user]
+  group node[:deployment][:group]
+  content <<-EOH
+    . /home/ubuntu/.cloudfoundry_deployment_profile
+    ruby /home/ubuntu/#{node[:deployment][:cf_deployment_start]} 2> /home/ubuntu/cferror.txt
+    exit 0
+  EOH
+end

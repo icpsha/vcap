@@ -9,3 +9,5 @@ default[:deployment][:domain] = "vcap.me"
 default[:deployment][:log_path] = File.join(deployment[:home], "log")
 default[:deployment][:profile] = File.expand_path(File.join(ENV["HOME"], ".cloudfoundry_deployment_profile"))
 default[:deployment][:local_run_profile] = File.expand_path(File.join(ENV["HOME"], ".cloudfoundry_deployment_local"))
+default[:deployment][:cf_deployment_start] = File.expand_path(File.join(ENV["HOME"], ".cloudfoundry_ec2_autostart"))
+default[:deployment][:sample_rc_local] = File.expand_path(File.join(ENV["HOME"], ".cloudfoundry_rc_local"))
