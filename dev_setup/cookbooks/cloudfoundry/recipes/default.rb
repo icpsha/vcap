@@ -12,7 +12,7 @@
 #  gem_binary File.join(node[:ruby][:path], "bin", "gem")
 #end
 gem_package "vmc_virgo" do
-  gem_binary File.join(ruby_path, "bin", "gem")
+  gem_binary File.join(node[:ruby][:path], "bin", "gem")
   version "0.0.1.beta"
   options "--pre"      
 end
