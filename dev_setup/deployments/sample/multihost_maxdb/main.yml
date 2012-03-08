@@ -1,6 +1,6 @@
 ---
 deployment:
-  name: "rest"
+  name: "main"
 jobs:
   install:
     - nats_server
