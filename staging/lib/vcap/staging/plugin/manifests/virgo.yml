@@ -20,5 +20,7 @@ staged_services:
     "version": "*"
   - "name": "postgresql"
     "version": "*"
+  - "name": "maxdb"
+    "version": "*"
 
 # vim: filetype=yaml
