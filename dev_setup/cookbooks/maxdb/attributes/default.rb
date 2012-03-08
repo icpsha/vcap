@@ -1,4 +1,4 @@
-default[:maxdb][:token] = "0xdeadbeef"
+default[:maxdb_node][:token] = "0xdeadbeef"
 
 default[:maxdb_node][:host] = "localhost"
 default[:maxdb_node][:index] = "0"

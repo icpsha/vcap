@@ -13,7 +13,7 @@ host: localhost
 #   port: 8080
 #   keepalive: true
 index: 0
-token: <%= node[:maxdb][:token] %>
+token: <%= node[:maxdb_node][:token] %>
 logging:
   level: debug
 mbus: nats://<%= node[:nats_server][:user] %>:<%= node[:nats_server][:password] %>@<%= node[:nats_server][:host] %>:<%= node[:nats_server][:port] %>/
