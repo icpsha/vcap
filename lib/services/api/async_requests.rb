@@ -1,4 +1,3 @@
-# Copyright (c) 2009-2011 VMware, Inc.
 require 'eventmachine'
 require 'em-http-request'
 require 'fiber'
@@ -24,9 +23,8 @@ module VCAP::Services::Api
           },
           :body => msg.encode,
         }
-        timeout = 1000
         if timeout
-          EM::HttpRequest.new(url, :inactivity_timeout => timeout).post(verb.to_sym, req)
+          EM::HttpRequest.new(url, :inactivity_timeout => 0 ).send(verb.to_sym, req)
         else
           EM::HttpRequest.new(url).send(verb.to_sym, req)
         end
