@@ -88,9 +88,11 @@ file node[:deployment][:cf_deployment_start] do
           end
           mbus = URI.parse(comp_config['mbus'])
           puts mbus
-          if !mbus.nil? && !user_data.nil?
-            mbus.host = user_data['message_bus']['host']
-            mbus.port = user_data['message_bus']['port'].to_i
+          if !mbus.nil? && !user_data.nil? && !user_data['landscape.ref.Main'].nil?
+          #  mbus.host = user_data['message_bus']['host']
+          #  mbus.port = user_data['message_bus']['port'].to_i
+             mbus.host = user_data['landscape.ref.Main']
+             mbus.port = 4222
             comp_config['mbus'] = "\#{mbus}"
           end
           File.open(file,'w+') {|out|
