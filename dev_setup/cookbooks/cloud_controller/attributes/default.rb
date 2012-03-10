@@ -17,7 +17,7 @@ default[:cloud_controller][:staging][:sinatra] = "sinatra.yml"
 default[:cloud_controller][:staging][:spring] = "spring.yml"
 default[:cloud_controller][:staging][:java_web] = "java_web.yml"
 default[:cloud_controller][:staging][:php] = "php.yml"
-default[:cloud_controller][:staging][:php] = "virgo.yml"
+default[:cloud_controller][:staging][:virgo] = "virgo.yml"
 
 # Default builtin services
 default[:cloud_controller][:builtin_services] = ["redis", "mongodb", "mysql", "neo4j", "maxdb"]
