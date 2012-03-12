@@ -30,7 +30,7 @@ template node[:cloud_controller][:config_file] do
 end
 #cf_install_gem(File.expand_path(File.join(node["cloudfoundry"]["path"], "stager")))
 cf_bundle_install(File.expand_path(File.join(node["cloudfoundry"]["path"], "staging")))
-bash "Local gem install for #{path}" do      
+bash "Local gem install for staging" do      
       cwd path
       user node[:deployment][:user]      
       code <<-EOH
