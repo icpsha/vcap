@@ -9,15 +9,7 @@ module CloudFoundry
       only_if { ::File.exist?(File.join(path, 'Gemfile')) }
     end
   end
- def cf_install_gem(path)
-    bash "Local gem install for #{path}" do
-      ignore_failure true
-      cwd path
-      user node[:deployment][:user]
-      code "#{File.join(node[:ruby][:path], "bin", "rake")} install_gem"
-      only_if { ::File.exist?(File.join(path, 'Rakefile')) }
-    end
- end 
+ 
   A_ROOT_SERVER = '198.41.0.4'
   def cf_local_ip(route = A_ROOT_SERVER)
     route ||= A_ROOT_SERVER

@@ -30,8 +30,15 @@ template node[:cloud_controller][:config_file] do
 end
 #cf_install_gem(File.expand_path(File.join(node["cloudfoundry"]["path"], "stager")))
 cf_bundle_install(File.expand_path(File.join(node["cloudfoundry"]["path"], "staging")))
-cf_install_gem(File.expand_path(File.join(node["cloudfoundry"]["path"], "staging")))
-cf_bundle_install(File.expand_path(File.join(node["cloudfoundry"]["path"], "cloud_controller")))
+bash "Local gem install for #{path}" do      
+      cwd path
+      user node[:deployment][:user]      
+      code <<-EOH
+        #{File.join(node[:ruby][:path], "bin", "gem")} build vcap_staging.gemspec
+        #{File.join(node[:ruby][:path], "bin", "gem")} install --no-ri --no-rdoc vcap_staging
+        EOH
+ end
+ cf_bundle_install(File.expand_path(File.join(node["cloudfoundry"]["path"], "cloud_controller")))
 
 staging_dir = File.join(node[:deployment][:config_path], "staging")
 node[:cloud_controller][:staging].each_pair do |framework, config|
