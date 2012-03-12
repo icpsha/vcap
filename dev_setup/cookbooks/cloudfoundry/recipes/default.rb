@@ -13,6 +13,6 @@
 #end
 gem_package "vmc_virgo" do
   gem_binary File.join(node[:ruby][:path], "bin", "gem")
-  version "0.0.1.beta"
+  version "0.0.1"
   options "--pre"      
 end
