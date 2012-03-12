@@ -31,7 +31,7 @@ end
 #cf_install_gem(File.expand_path(File.join(node["cloudfoundry"]["path"], "stager")))
 cf_bundle_install(File.expand_path(File.join(node["cloudfoundry"]["path"], "staging")))
 bash "Local gem install for staging" do    
-      cwd #{File.join(node["cloudfoundry"]["path"], "staging")}
+      cwd File.join(node["cloudfoundry"]["path"], "staging")
       user node[:deployment][:user]      
       code <<-EOH
         pwd
