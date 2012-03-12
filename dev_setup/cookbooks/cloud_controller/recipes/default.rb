@@ -28,7 +28,7 @@ template node[:cloud_controller][:config_file] do
     :builtin_services => builtin_services
   })
 end
-cf_install_gem(File.expand_path(File.join(node["cloudfoundry"]["path"], "stager")))
+#cf_install_gem(File.expand_path(File.join(node["cloudfoundry"]["path"], "stager")))
 cf_install_gem(File.expand_path(File.join(node["cloudfoundry"]["path"], "staging")))
 cf_bundle_install(File.expand_path(File.join(node["cloudfoundry"]["path"], "cloud_controller")))
 
