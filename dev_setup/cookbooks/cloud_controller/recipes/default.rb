@@ -34,6 +34,7 @@ bash "Local gem install for staging" do
       cwd #{File.join(node["cloudfoundry"]["path"], "staging")}
       user node[:deployment][:user]      
       code <<-EOH
+        echo pwd
         #{File.join(node[:ruby][:path], "bin", "gem")} build vcap_staging.gemspec
         #{File.join(node[:ruby][:path], "bin", "gem")} install --no-ri --no-rdoc vcap_staging
         EOH
