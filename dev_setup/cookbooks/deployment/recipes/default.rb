@@ -93,8 +93,13 @@ file node[:deployment][:cf_deployment_start] do
           #  mbus.port = user_data['message_bus']['port'].to_i
              mbus.host = user_data['landscape.ref.Main']
              mbus.port = 4222
+             comp_config['mbus'] = "\#{mbus}"
+          elsif !mbus.nil?
+            mbus.host = 'localhost'
+            mbus.port = 4222
             comp_config['mbus'] = "\#{mbus}"
           end
+          
           File.open(file,'w+') {|out|
             YAML.dump(comp_config,out)
           }
