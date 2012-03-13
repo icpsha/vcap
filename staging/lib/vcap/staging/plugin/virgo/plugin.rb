@@ -82,7 +82,7 @@ class VirgoPlugin < StagingPlugin
   def startup_script
     vars = environment_hash
     vars['JAVA_OPTS'] = configure_memory_opts
-    vars['JAVA_HOME'] = (ENV['JAVA_HOME'].nil? && '/usr/lib/jvm/java-6-sun') || ENV['JAVA_HOME']
+    vars['JAVA_HOME'] = (ENV['JAVA_HOME'].nil? && '/usr/lib/jvm/java-6-openjdk') || ENV['JAVA_HOME']
     generate_startup_script(vars) do
       <<-VIRGO
 export CATALINA_OPTS="$CATALINA_OPTS `ruby resources/set_environment`"

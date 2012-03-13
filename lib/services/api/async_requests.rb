@@ -23,11 +23,11 @@ module VCAP::Services::Api
           },
           :body => msg.encode,
         }
-        if timeout
-          EM::HttpRequest.new(url, :inactivity_timeout => 0 ).send(verb.to_sym, req)
-        else
-          EM::HttpRequest.new(url).send(verb.to_sym, req)
-        end
+       # if timeout
+          EM::HttpRequest.new(url, :inactivity_timeout => 60 ).send(verb.to_sym, req)
+       # else
+       #   EM::HttpRequest.new(url).send(verb.to_sym, req)
+      #  end
       end
 
       def fibered(url, token, verb, timeout, msg=VCAP::Services::Api::EMPTY_REQUEST)
