@@ -1,0 +1,9 @@
+---
+ip_route: localhost
+mbus: nats://localhost:4222/
+index: 0
+logging:
+  level: debug
+pid: /var/vcap/sys/run/cloud_director.pid
+local_db: jdbc:postgresql://localhost:5432/cloudcontroller
+
