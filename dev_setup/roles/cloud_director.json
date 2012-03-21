@@ -1,0 +1,12 @@
+{
+  "name": "cloud_director",
+  "override_attributes": {},
+  "json_class": "Chef::Role",
+  "description": "Cloud Director component for Cloudfoundry",
+  "chef_type": "role",
+  "run_list" : ["recipe[deployment]",
+                "recipe[essentials]",
+                "recipe[ruby]",
+                "recipe[java]",
+                "recipe[cloud_director]"]
+}

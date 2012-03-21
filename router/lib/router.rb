@@ -162,7 +162,7 @@ EM.run do
   VCAP::Component.varz[:tags] = {}
 
   @router_id = VCAP.secure_uuid
-  @hello_message = { :id => @router_id, :instance_ip => get_local_ip, :instance_port=> config['sock'].nil? ? config['port']:80 ,:version => Router::VERSION }.to_json.freeze
+  @hello_message = { :id => @router_id, :instance_ip => get_local_ip,:instance_id => config['instance_id'], :instance_port=> config['sock'].nil? ? config['port']:80 ,:version => Router::VERSION }.to_json.freeze
   Router.log_connection_stats
 
   # This will check on the state of the registered urls, do maintenance, etc..

@@ -76,10 +76,32 @@ file node[:deployment][:cf_deployment_start] do
       config_dir = "\#{cf_home}/.deployments/\#{local_dep_name}/config"
       public_ip = `wget -qO -  http://169.254.169.254/latest/meta-data/public-ipv4`
       local_ip = `wget -qO -  http://169.254.169.254/latest/meta-data/local-ipv4`
+      instance_id = `wget -qO -  http://169.254.169.254/latest/meta-data/instance-id`
       user_data = JSON.parse(`wget -qO -  http://169.254.169.254/latest/user-data`)
       Dir.chdir(config_dir) do
         Dir.glob("*.yml").each{|file|
           comp_config = YAML.load(File.read(file))
+          comp_config['instance_id'] = instance_id
+          if !user_data['landscapeid'].nil?
+           comp_config['landscape_id'] = user_data['landscapeid']
+          end
+          if !user_data['landscape.val.dea_image'].nil?
+           comp_config['dea_image'] = user_data['landscape.val.dea_image']
+          end
+          
+          if !user_data['landscape.val.main_image'].nil?
+           comp_config['main_image'] = user_data['landscape.val.main_image']
+          end
+          
+          if !user_data['landscape.val.router_image'].nil?
+           comp_config['router_image'] = user_data['landscape.val.router_image']
+          end
+          if !user_data['landscape.val.provider_uri'].nil?
+           comp_config['provider_uri'] = user_data['landscape.val.provider_uri']
+          end
+          if !user_data['loadbalancer_name'].nil? && !comp_config['loadbalancer'].nil?             
+           comp_config['loadbalancer'] = user_data['loadbalancer_name']
+          end
           if !comp_config['local_route'].nil?
             comp_config['local_route'] = local_ip
           end
