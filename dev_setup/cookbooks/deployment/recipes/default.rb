@@ -136,7 +136,7 @@ file node[:deployment][:sample_rc_local] do
   group node[:deployment][:group]
   content <<-EOH
     . /home/ubuntu/.cloudfoundry_deployment_profile
-    ruby /home/ubuntu/#{node[:deployment][:cf_deployment_start]} 2> /home/ubuntu/cferror.txt
+    ruby #{node[:deployment][:cf_deployment_start]} 2> /home/ubuntu/cferror.txt
     exit 0
   EOH
 end
