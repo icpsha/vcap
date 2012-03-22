@@ -1,9 +1,12 @@
 ---
-ip_route: localhost
+ip_route: 127.0.0.1
+pid: /var/vcap/sys/run/cloud_director.pid
 mbus: nats://localhost:4222/
-index: 0
-logging:
-  level: debug
-pid: /var/vcap/sys/run/cloud_watcher.pid
 local_db: jdbc:postgresql://localhost:5432/cloudcontroller
-
+loadbalancer: lbalancer
+cloud_controller_db: jdbc:postgresql://localhost:5432/cloudcontroller
+cloud_name: Titanium
+dea_image: 
+router_image:
+main_image: 
+provider_uri: http://titaniumui
