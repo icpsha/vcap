@@ -1,8 +1,7 @@
 #
-# Cookbook Name:: mysql
+# Cookbook Name:: maxdb
 # Recipe:: default
 #
-# Copyright 2011, VMware
 #
 #
 node[:local_ip] ||= cf_local_ip

@@ -258,6 +258,7 @@ module DEA
         EM.add_periodic_timer(VARZ_UPDATE_INTERVAL) { snapshot_varz }
 
         NATS.publish('dea.start', @hello_message_json)
+        send_started_message
       end
     end
 
@@ -341,7 +342,7 @@ module DEA
       # Respond with where to find us if we can help.
       if @shutting_down
         @logger.debug('Ignoring request, shutting down.')
-      elsif @num_clients >= @max_clients || @reserved_mem > @max_memory
+      elsif @num_clients >= @max_clients || @reserved_mem > 0 # @max_memory
         @logger.debug('Ignoring request, not enough resources.')
       else
         # Check that we properly support the runtime requested
@@ -515,7 +516,8 @@ module DEA
         num_fds = limits['fds'] if limits['fds']
         disk = limits['disk'] if limits['disk']
       end
-
+# Assign all the memory to the single droplet (Ignore memory spec during deployment)
+      mem = (0.9 * @max_memory).to_i
       @logger.debug("Requested Limits: mem=#{mem}M, fds=#{num_fds}, disk=#{disk}M")
 
       if @shutting_down
@@ -708,6 +710,7 @@ module DEA
         # action to correct the error.
         if success
           start_operation.call
+          send_engagement_message
         else
           @logger.warn("Failed staging app dir '#{instance_dir}', not starting app #{instance[:log_id]}")
           # This should do the right thing despite the app never being started.
@@ -735,7 +738,7 @@ module DEA
         end
       end
       f.resume
-
+  
     end
 
     def process_router_start(message)
@@ -1155,7 +1158,7 @@ module DEA
           stop_droplet(instance)
         end
       end
-
+      send_stopped_message
       # Allows messages to get out.
       EM.add_timer(0.25) do
         snapshot_app_state
@@ -1213,6 +1216,18 @@ module DEA
 
       # Cleanup resource usage and files..
       cleanup_droplet(instance)
+      # Inform the cloudDirector if we are hosting zero droplets
+      running_instances = 0
+      @droplets.each_pair do |id, instances|
+        instances.each_value do |instance|
+          if [:STARTING,:RUNNING].include?(instance[:state])
+            running_instances+=1
+          end
+        end
+      end
+      if running_instances == 0
+        send_retirement_message()   
+      end   
     end
 
     def cleanup_droplet(instance)
@@ -1272,7 +1287,44 @@ module DEA
       NATS.publish('droplet.exited', exit_message)
       @logger.debug("Sent droplet.exited #{exit_message}")
     end
-
+   
+   def send_started_message()
+      msg = {
+        :instance_id =>  @config['instance_id'],
+        :instance_ip => @local_ip,
+      }
+      msg = msg.to_json
+      NATS.publish('dea.started', msg)
+      @logger.debug("Sent dea.started #{msg}")
+    end
+    def send_stopped_message()
+      msg = {
+        :instance_id =>  @config['instance_id'],
+        :instance_ip => @local_ip,
+      }
+      msg = msg.to_json
+      NATS.publish('dea.stopped', msg)
+      @logger.debug("Sent dea.stopped #{msg}")
+    end
+   def send_engagement_message()
+      msg = {
+        :instance_id =>  @config['instance_id'],
+        :instance_ip => @local_ip,
+      }
+      msg = msg.to_json
+      NATS.publish('dea.engaged', msg)
+      @logger.debug("Sent dea.engaged #{msg}")
+    end
+    def send_retirement_message()
+      msg = {
+        :instance_id =>  @config['instance_id'],
+        :instance_ip => @local_ip,
+      }
+      msg = msg.to_json
+      NATS.publish('dea.retired', msg)
+      @logger.debug("Sent dea.retired #{msg}")
+    end
+   
     def send_exited_message(instance)
       return if instance[:notified]
 

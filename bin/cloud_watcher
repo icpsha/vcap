@@ -1,4 +1,0 @@
-#!/usr/bin/env ruby
-
-
-exec(File.expand_path("../../cloud_watcher/bin/cloud_watcher", __FILE__), *ARGV)

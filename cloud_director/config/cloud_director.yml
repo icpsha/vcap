@@ -4,6 +4,10 @@ mbus: nats://localhost:4222/
 index: 0
 logging:
   level: debug
+<<<<<<< HEAD
 pid: /var/vcap/sys/run/cloud_director.pid
+=======
+pid: /var/vcap/sys/run/cloud_watcher.pid
+>>>>>>> upstream/master
 local_db: jdbc:postgresql://localhost:5432/cloudcontroller
 
