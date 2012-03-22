@@ -1,5 +1,5 @@
 class JobManager
-  [NATS, CF, CCDB].each do |job|
+  [NATS, CF, CCDB,CD].each do |job|
     task job.to_sym do
       install(job)
     end
