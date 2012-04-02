@@ -121,6 +121,15 @@ file node[:deployment][:cf_deployment_start] do
             mbus.port = 4222
             comp_config['mbus'] = "\#{mbus}"
           end
+          database_environment = comp_config['database_environment']
+          if database_environment
+            env = comp_config['rails_environment'] || 'production'
+            if user_data['landscape.ref.CCDB']
+              database_environment[env]['host'] = user_data['landscape.ref.CCDB'] 
+            else
+              database_environment[env]['host'] = 'localhost'
+            end           
+          end
           
           File.open(file,'w+') {|out|
             YAML.dump(comp_config,out)
