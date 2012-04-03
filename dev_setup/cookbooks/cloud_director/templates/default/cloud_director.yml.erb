@@ -2,9 +2,9 @@
 ip_route: 127.0.0.1
 pid: /var/vcap/sys/run/cloud_director.pid
 mbus: nats://<%= node[:nats_server][:user] %>:<%= node[:nats_server][:password] %>@<%= node[:nats_server][:host] %>:<%= node[:nats_server][:port] %>/
-local_db: jdbc:postgresql://localhost:5432/cloudcontroller
+local_db: jdbc:postgresql://localhost:5432/cloud_controller
 loadbalancer: lbalancer
-cloud_controller_db: jdbc:postgresql://localhost:5432/cloudcontroller
+cloud_controller_db: jdbc:postgresql://localhost:5432/cloud_controller
 cloud_name: Titanium
 dea_image: <%= node[:cd][:dea_image]%>
 router_image: <%= node[:cd][:router_image]%>
@@ -25,3 +25,5 @@ autoscaling_interval_sec: 120000
 aggregation_delay_sec: 32000
 autoscaling_delay_sec: 125000
 sleep_period_min: 15
+db_user: root
+db_password: changeme
