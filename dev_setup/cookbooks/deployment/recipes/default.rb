@@ -136,6 +136,12 @@ file node[:deployment][:cf_deployment_start] do
           }
         }
       end
+      #Special handling for nats config
+      comp_config = YAML.load(File.read("#{config_dir}/nats_server/nats_server.yml"))
+      comp_config['net'] = local_ip
+      File.open("#{config_dir}/nats_server/nats_server.yml",'w+') {|out|
+            YAML.dump(comp_config,out)
+       }
       exec("sudo \#{cf_home}/vcap/dev_setup/bin/vcap_dev -d \#{cf_home} -n \#{local_dep_name} start")
 
   EOH
