@@ -23,14 +23,14 @@ end
 case node['platform']
 when "ubuntu"
   template "nats_server" do
-    path File.join("", "etc", "init.d", "nats_server")
+    path File.join("", "etc", "init.d", "nats-server")
     source "nats_server.erb"
     owner node[:deployment][:user]
     mode 0755
-    notifies :restart, "service[nats_server]"
+    notifies :restart, "service[nats-server]"
   end
 
-  service "nats_server" do
+  service "nats-server" do
     supports :status => true, :restart => true, :reload => true
     action [ :enable, :start ]
   end
@@ -43,5 +43,5 @@ template "nats_server.yml" do
   source "nats_server.yml.erb"
   owner node[:deployment][:user]
   mode 0644
-  notifies :restart, "service[nats_server]"
+  notifies :restart, "service[nats-server]"
 end
