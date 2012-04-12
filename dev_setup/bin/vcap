@@ -216,9 +216,14 @@ class NatsServer
     end
   end
 
-  def initialize(uri=NATS::DEFAULT_URI, pid_file=NATS::AUTOSTART_PID_FILE)
+  def initialize(config_file=nil,uri=NATS::DEFAULT_URI, pid_file=NATS::AUTOSTART_PID_FILE)
     @uri = URI.parse(uri)
     @pid_file = pid_file
+    @nconfig = config_file
+    if @nconfig
+    	nats_conf = YAML.load(File.read(@nconfig))
+    	@pid_file = nats_conf['pid_file']
+    end
   end
 
   def server_pid
@@ -230,14 +235,20 @@ class NatsServer
       @was_running = true
       return
     end
-
+	puts "Nats is not running. Trying to start"
     nats_server = `which nats-server`
     unless $? == 0 && nats_server
       STDERR.puts "Could not locate a nats-server, exiting.".red
       exit 1
     end
     nats_server.chomp!
-    `#{nats_server} -p #{@uri.port} -P #{@pid_file} -d 2> /dev/null`
+    if @nconfig
+    	puts "Starting nats with configuration #{@nconfig}"
+    	`#{nats_server} -d -c #{@nconfig}`
+    else
+    	puts "Starting nats without the configuration"
+    	`#{nats_server} -p #{@uri.port} -P #{@pid_file} -d 2> /dev/null`
+    end
     NATS.wait_for_server(@uri, 5)
   end
 
@@ -256,7 +267,14 @@ end
 
 module Run
   def self.start_init
-    nats_server = NatsServer.new
+  	puts $config_dir
+  	nats_config = File.join($config_dir,"nats_server","nats_server.yml")
+  	puts nats_config
+  	if File.exists?(nats_config)
+    	nats_server = NatsServer.new nats_config
+    else
+    	nats_server = NatsServer.new
+    end 
     nats_server.start_server
   end
 
@@ -269,14 +287,19 @@ module Run
     # Only process this if no one else running..
     running_components = components(args).select {|c| c.running?}.map{|c| c.name }
     return unless running_components.empty?
-    nats_server = NatsServer.new
+    nats_config = File.join($config_dir,"nats_server","nats_server.yml")
+  	if File.exists?(nats_config)
+    	nats_server = NatsServer.new nats_config
+    else
+    	nats_server = NatsServer.new
+    end    
     return unless nats_server.is_running?
     nats_server.kill_server
   end
 
   def self.stop(args)
     components(args).each(&:stop)
-    self.stop_cleanup(args)
+    #self.stop_cleanup(args)
   end
 
   def self.restart(args)

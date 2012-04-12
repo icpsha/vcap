@@ -136,9 +136,9 @@ file node[:deployment][:cf_deployment_start] do
           }
         }
       end
-      #Special handling for nats config
+      #Special handling for nats config (Let it listen on all ports by default)
       comp_config = YAML.load(File.read("#{config_dir}/nats_server/nats_server.yml"))
-      comp_config['net'] = local_ip
+      comp_config['net'] = '0.0.0.0'
       File.open("#{config_dir}/nats_server/nats_server.yml",'w+') {|out|
             YAML.dump(comp_config,out)
        }
