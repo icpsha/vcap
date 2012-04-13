@@ -17,7 +17,7 @@ directory nats_config_dir do
   mode "0755"
   recursive true
   action :create
-  notifies :restart, "service[nats_server]"
+  notifies :restart, "service[nats-server]"
 end
 
 case node['platform']
