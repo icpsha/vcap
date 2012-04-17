@@ -263,6 +263,12 @@ module DEA
     end
 
     def send_heartbeat
+      return if@shutting_down
+      if @droplets.empty?
+        send_started_message
+      else
+        send_engagement_message
+      end
       return if @droplets.empty? || @shutting_down
       heartbeat = {:droplets => []}
       @droplets.each_value do |instances|
