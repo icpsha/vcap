@@ -249,7 +249,7 @@ class NatsServer
     	puts "Starting nats without the configuration"
     	`#{nats_server} -p #{@uri.port} -P #{@pid_file} -d 2> /dev/null`
     end
-    NATS.wait_for_server(@uri, 5)
+    NATS.wait_for_server(@uri, 10)
   end
 
   def is_running?
