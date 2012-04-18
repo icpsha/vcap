@@ -43,6 +43,12 @@ class App < ActiveRecord::Base
       end
   end
 
+  def self.process_scale_up_message(decoded_json)
+    app_id = decoded_json[:droplet]
+      if app = App.find_by_id(app_id)
+        AppManager.new(app).scale_up_message_received(decoded_json)
+      end
+  end
   def self.find_by_collaborator_and_id(user, app_id)
     App.joins(:app_collaborations).where(:app_collaborations => {:user_id => user.id}, :apps => {:id => app_id}).first
   end

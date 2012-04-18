@@ -21,4 +21,15 @@ EM.next_tick do
       CloudController.logger.error(e)
     end
   end
+  NATS.subscribe('clouddirector.scaleup') do |msg|
+    begin
+      payload = Yajl::Parser.parse(msg, :symbolize_keys => true)
+      CloudController::UTILITY_FIBER_POOL.spawn do
+        App.process_scale_up_message(payload)
+      end
+    rescue => e
+      CloudController.logger.error("Exception processing cloud director request: '#{msg}'")
+      CloudController.logger.error(e)
+    end
+  end
 end

@@ -186,6 +186,12 @@ class AppManager
       end
     end
   end
+  
+  def scale_up_message_received(payload)
+    CloudController.logger.error("[CloudDirector] Received Scale Up request for app #{app.id} - #{app.name}")
+    indices = payload[:number_of_instances]
+    change_running_instances(indices)
+  end
  def scale_down_message_received(payload)
     CloudController.logger.error("[CloudDirector] Received Scale Down request for app #{app.id} - #{app.name}")
     indices = payload[:number_of_instances]
