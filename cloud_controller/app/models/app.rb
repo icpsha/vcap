@@ -39,6 +39,7 @@ class App < ActiveRecord::Base
   def self.process_scale_down_message(decoded_json)
     app_id = decoded_json[:droplet]
       if app = App.find_by_id(app_id)
+        app.instances = app.instances - decoded_json[:number_of_instances]
         AppManager.new(app).scale_down_message_received(decoded_json)
       end
   end
@@ -46,6 +47,7 @@ class App < ActiveRecord::Base
   def self.process_scale_up_message(decoded_json)
     app_id = decoded_json[:droplet]
       if app = App.find_by_id(app_id)
+        app.instances = app.instances + decoded_json[:number_of_instances]
         AppManager.new(app).scale_up_message_received(decoded_json)
       end
   end
