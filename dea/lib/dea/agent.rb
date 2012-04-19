@@ -87,7 +87,7 @@ module DEA
       @downloads_pending = {}
 
       @shutting_down = false
-
+      @engaged = false
       # Path to the ruby executable the dea should use when executing the prepare script.
       # BOSH sets this in the config. For development, try to pick a ruby if none provided.
       @dea_ruby = config['dea_ruby'] || `which ruby`.strip
@@ -264,7 +264,7 @@ module DEA
 
     def send_heartbeat
       return if@shutting_down
-      if @droplets.empty?
+      if @droplets.empty? || !@engaged
         send_started_message
       else
         send_engagement_message
@@ -282,6 +282,7 @@ module DEA
     def send_single_heartbeat(instance)
       heartbeat = {:droplets => [generate_heartbeat(instance)]}
       NATS.publish('dea.heartbeat', heartbeat.to_json)
+      @engaged = true
     end
 
     def generate_heartbeat(instance)
