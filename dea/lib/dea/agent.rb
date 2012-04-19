@@ -489,6 +489,7 @@ module DEA
           stop_droplet(instance)
         end
       end
+      @engaged = false
     end
 
     def process_dea_start(message)
