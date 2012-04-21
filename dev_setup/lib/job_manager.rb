@@ -8,6 +8,7 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 
 class JobManager
   ALL = "all"
+  SAPALL = "sapall"
   NATS = "nats_server"
   ROUTER = "router"
   CC = "cloud_controller"
@@ -31,6 +32,7 @@ class JobManager
 
   # All supported jobs
   JOBS = [ALL, NATS, ROUTER, CF, CC, HM, DEA, CCDB,CD] + SERVICES_NODE + SERVICES_GATEWAY
+  SAPJOBS = [ NATS, ROUTER, CF, CC, HM, DEA, CCDB,CD] + ["maxdb_node", "maxdb_gateway"]
   SYSTEM_JOB = [CF]
 
   # List of the required properties for jobs

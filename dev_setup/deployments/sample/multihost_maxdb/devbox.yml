@@ -3,4 +3,4 @@ deployment:
   name: "devbox"
 jobs:
   install:
-    - all
+    - sapall
