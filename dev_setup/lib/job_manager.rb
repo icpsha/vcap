@@ -205,7 +205,7 @@ class JobManager
       # Make sure that the "install" and "installed" jobs do not intersect
       detect_duplicate_jobs
 
-      if @config["jobs"]["install"].include?("all")
+      if @config["jobs"]["install"].include?("all") || @config["jobs"]["install"].include?("sapall")
         # Install all jobs
         if !@config["jobs"]["installed"].nil?
           puts "Please correct your config file. You are trying to install all jobs, but you have also specified an 'installed' section"
@@ -218,7 +218,11 @@ class JobManager
         end
 
         @all_install = true
-        Rake.application[ALL].invoke
+        if @config["jobs"]["install"].include?("all")
+          Rake.application[ALL].invoke
+        else
+          Rake.application[SAPALL].invoke
+        end
         return
       end
 
