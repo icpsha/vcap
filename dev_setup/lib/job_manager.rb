@@ -31,7 +31,7 @@ class JobManager
   end
 
   # All supported jobs
-  JOBS = [ALL, NATS, ROUTER, CF, CC, HM, DEA, CCDB,CD] + SERVICES_NODE + SERVICES_GATEWAY
+  JOBS = [SAPALL,ALL, NATS, ROUTER, CF, CC, HM, DEA, CCDB,CD] + SERVICES_NODE + SERVICES_GATEWAY
   SAPJOBS = [ NATS, ROUTER, CF, CC, HM, DEA, CCDB,CD] + ["maxdb_node", "maxdb_gateway"]
   SYSTEM_JOB = [CF]
 

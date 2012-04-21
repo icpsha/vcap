@@ -31,7 +31,7 @@ class JobManager
 
   all_jobs = []
   JOBS.each do |job|
-    all_jobs << job.to_sym if job != ALL
+    all_jobs << job.to_sym if job != ALL && job != SAPALL
   end
   
   sapall_jobs = []
