@@ -137,7 +137,7 @@ file node[:deployment][:cf_deployment_start] do
           }
         end
       rescue
-        $stderr.put "Unable to fetch user data. Leaving the configuration as it is.. Are you running on EC2 cloud?"
+        $stderr.puts "Unable to fetch user data. Leaving the configuration as it is.. Are you running on EC2 cloud?"
       end
       #Special handling for nats config (Let it listen on all ports by default)
       if File.exists?(File.join(config_dir,"nats_server","nats_server.yml"))
