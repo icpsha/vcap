@@ -69,7 +69,7 @@ file node[:deployment][:cf_deployment_start] do
       require 'yaml'
       require 'uri'
       begin
-        file = File.open(File.expand_path("/home/ubuntu/.cloudfoundry_deployment_target"), "rb")
+        file = File.open(File.expand_path("\#{ENV["HOME"]}/.cloudfoundry_deployment_target"), "rb")
         cf_local_dep = JSON.parse!(file.read)
         cf_home = cf_local_dep['cloudfoundry_home']
         local_dep_name = cf_local_dep['deployment_name']
@@ -155,8 +155,8 @@ file node[:deployment][:sample_rc_local] do
   owner node[:deployment][:user]
   group node[:deployment][:group]
   content <<-EOH
-    . /home/ubuntu/.cloudfoundry_deployment_profile
-    ruby #{node[:deployment][:cf_deployment_start]} 2> /home/ubuntu/cferror.txt
+    . #{node[:deployment][:profile]}
+    ruby #{node[:deployment][:cf_deployment_start]} 2> #{ENV["HOME"]}/cferror.txt
     exit 0
   EOH
 end
