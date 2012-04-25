@@ -36,21 +36,7 @@ class App < ActiveRecord::Base
   validates_inclusion_of :state, :in => AppStates
   validates_inclusion_of :package_state, :in => PackageStates
   
-  def self.process_scale_down_message(decoded_json)
-    app_id = decoded_json[:droplet]
-      if app = App.find_by_id(app_id)
-        app.instances = app.instances - decoded_json[:number_of_instances]
-        begin
-          app.save!
-        rescue
-          CloudController.logger.error "app: #{app.id} Failed to save new app errors: #{app.errors}"
-          raise CloudError.new(CloudError::APP_INVALID)
-        end
-        AppManager.new(app).scale_down_message_received(decoded_json)
-      end
-  end
-
-  def self.process_scale_up_message(decoded_json)
+  def self.process_scaling_event_message(decoded_json)
     app_id = decoded_json[:droplet]
       if app = App.find_by_id(app_id)
         app.instances = app.instances + decoded_json[:number_of_instances]
@@ -60,9 +46,10 @@ class App < ActiveRecord::Base
           CloudController.logger.error "app: #{app.id} Failed to save new app errors: #{app.errors}"
           raise CloudError.new(CloudError::APP_INVALID)
         end
-        AppManager.new(app).scale_up_message_received(decoded_json)
+        AppManager.new(app).scaling_event_message_received(decoded_json)
       end
   end
+
   def self.find_by_collaborator_and_id(user, app_id)
     App.joins(:app_collaborations).where(:app_collaborations => {:user_id => user.id}, :apps => {:id => app_id}).first
   end

@@ -187,16 +187,12 @@ class AppManager
     end
   end
   
-  def scale_up_message_received(payload)
-    CloudController.logger.error("[CloudDirector] Received Scale Up request for app #{app.id} - #{app.name}")
+  def scaling_event_message_received(payload)
     indices = payload[:number_of_instances]
+    CloudController.logger.warn("[CloudDirector] Received Scaling Event request for app #{app.id} - #{app.name}  for #{indices} instances")
     change_running_instances(indices)
   end
- def scale_down_message_received(payload)
-    CloudController.logger.error("[CloudDirector] Received Scale Down request for app #{app.id} - #{app.name}")
-    indices = payload[:number_of_instances]
-    change_running_instances(-1*indices)
-  end
+
   def start_instances(start_message, index, max_to_start)
     EM.next_tick do
       f = Fiber.new do

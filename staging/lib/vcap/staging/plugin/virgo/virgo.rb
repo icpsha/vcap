@@ -2,9 +2,10 @@ require 'fileutils'
 require 'yaml'
 
 class Virgo
-  AUTOSTAGING_JAR = 'osgi.autostager-1.0.0.PTYP.jar'
+  #AUTOSTAGING_JAR = 'osgi.autostager-1.0.0.PTYP.jar'
+  AUTOSTAGING_JAR = 'osgi.pfservices-0.0.1.jar'
   AUTOSTAGING_DEP =['com.springsource.org.codehaus.jackson-1.4.3.jar','com.springsource.org.codehaus.jackson.mapper-1.4.3.jar',
-                     'com.springsource.org.joda.time-1.5.2.jar' ]
+                     'com.springsource.org.joda.time-1.5.2.jar','commons-pool-1.5.4.jar','org.apache.servicemix.bundles.commons-dbcp-1.4_3.jar']
   SERVICE_DRIVER_HASH = {
       "mysql-5.1" => 'com.springsource.com.mysql.jdbc-5.1.6.jar',
       "postgresql-9.0" => 'com.springsource.org.postgresql.jdbc4-8.3.604.jar',
@@ -49,9 +50,10 @@ class Virgo
   end
   
   def self.prepare_stager(webapp_root)
+    dest = File.join(webapp_root, "..", "pickup")
+    copy_jar AUTOSTAGING_JAR , dest
     dest = File.join(webapp_root, "..", Virgo.repository,"usr")
-     copy_jar AUTOSTAGING_JAR , dest
-     AUTOSTAGING_DEP.each{ |jar|
+    AUTOSTAGING_DEP.each{ |jar|
         copy_jar jar , dest
        }
   end

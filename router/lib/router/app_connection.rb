@@ -1,7 +1,9 @@
 # Copyright (c) 2009-2011 VMware, Inc.
+require 'nats/client'
 module AppConnection
 
   attr_reader :outstanding_requests
+  attr_accessor :req_path
 
   def initialize(client, request, droplet)
     Router.log.debug "Creating AppConnection"
@@ -17,6 +19,7 @@ module AppConnection
     Router.log.debug "Completed AppConnection"
     Router.log.debug Router.connection_stats
     Router.log.debug "------------"
+    @served = false
   end
 
   def connection_completed
@@ -33,6 +36,7 @@ module AppConnection
 
   # We have the HTTP Headers complete from the client
   def on_headers_complete(headers)
+    @served = true
     check_sticky_session = STICKY_SESSIONS =~ headers[SET_COOKIE_HEADER]
     sent_session_cookie = false # Only send one in case of multiple hits
 
@@ -61,7 +65,6 @@ module AppConnection
 
   def process_response_body_chunk(data)
     return unless data and data.bytesize > 0
-
     # Let parser process as well to properly determine end of message.
     # TODO: Once EM 1.0, add in optional bytsize proxy if Content-Length is present.
     psize = @parser << data
@@ -79,8 +82,12 @@ module AppConnection
 
   def record_stats
     return unless @parser
-
     latency = ((Time.now - @start_time) * 1000).to_i
+    if @droplet &&( Router.send_metrics == 'always' || (Router.send_metrics == 'only_if_threshold' && (latency/1000).to_i > Router.response_threshold))
+      metrics_message = { :host => @droplet[:host], :port => @droplet[:port],:request_path => @req_path, :latency_ms=> latency }.to_json
+      NATS.publish('router.metrics',metrics_message);
+      Router.log.info "Published router.metrics = > #{metrics_message}"
+    end   
     response_code = @parser.status_code
     response_code_metric = :responses_xxx
     if (200..299).include?(response_code)
@@ -133,7 +140,6 @@ module AppConnection
     @buf = @buf ? @buf << data : data
     if hindex = @buf.index(HTTP_HEADERS_END) # all http headers received, figure out where to route to..
       @parser = Http::Parser.new(self)
-
       # split headers and rest of body out here.
       @headers = @buf.slice!(0...hindex+HTTP_HEADERS_END_SIZE)
 
@@ -153,6 +159,7 @@ module AppConnection
   def rebind(client, request)
     @start_time = Time.now
     @client = client
+    @served = false
     reuse(request)
   end
 
@@ -169,6 +176,11 @@ module AppConnection
   end
 
   def unbind
+    if !@served && @droplet 
+      timeout_message = { :host => @droplet[:host], :port => @droplet[:port],:request_path => @req_path, :latency_ms=> ((Time.now - @start_time) * 1000).to_i }.to_json
+      NATS.publish('router.timeout',timeout_message);
+      Router.log.info "Published router.timeout = > #{timeout_message}"
+    end
     Router.outstanding_request_count -= @outstanding_requests
     unless @connected
       Router.log.info "Could not connect to backend for url:#{@droplet[:url]} @ #{@droplet[:host]}:#{@droplet[:port]}"

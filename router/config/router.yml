@@ -8,7 +8,9 @@ mbus: nats://localhost:4222
 logging:
   level: info
 pid: /var/vcap/sys/run/router.pid
-
+send_router_metrics: always          
+response_threshold: 20
+#send_router_metrics: always / never / only_if_threshold
 # Used for /healthz and /vars endpoints. If not provided random
 # values will be generated on component start. Uncomment to use
 # static values.

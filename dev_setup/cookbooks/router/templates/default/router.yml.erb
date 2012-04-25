@@ -6,3 +6,6 @@ mbus: nats://<%= node[:nats_server][:user] %>:<%= node[:nats_server][:password] 
 logging:
   level: info
 pid: /var/vcap/sys/run/router.pid
+send_router_metrics: always          
+response_threshold: 20
+#send_router_metrics: always / never / only_if_threshold

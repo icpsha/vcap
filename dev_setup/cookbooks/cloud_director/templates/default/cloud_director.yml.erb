@@ -17,7 +17,8 @@ scale_down_limit: -0.6
 smart_kill_min: 15
 low_cpu_limit: 30
 high_cpu_limit: 85
-scale_down_instances: 1
+scale_up_magnitude: 1
+scale_down_magnitude: -1
 max_num_instances: 10
 monitoring_interval_sec: 5000
 aggregation_interval_sec: 30000
@@ -27,8 +28,6 @@ autoscaling_delay_sec: 125000
 sleep_period_min: 15
 db_user: root
 db_password: changeme
-simulate_scaling: true
-AutoScalingEnabled: false
 server_size: m1.small
 scale_up_switch: true
 scale_down_switch: false
