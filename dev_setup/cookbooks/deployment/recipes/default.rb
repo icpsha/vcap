@@ -68,12 +68,13 @@ file node[:deployment][:cf_deployment_start] do
       require 'json'
       require 'yaml'
       require 'uri'
+      
+      file = File.open(File.expand_path("\#{ENV["HOME"]}/.cloudfoundry_deployment_target"), "rb")
+      cf_local_dep = JSON.parse!(file.read)
+      cf_home = cf_local_dep['cloudfoundry_home']
+      local_dep_name = cf_local_dep['deployment_name']
+      config_dir = "\#{cf_home}/.deployments/\#{local_dep_name}/config"
       begin
-        file = File.open(File.expand_path("\#{ENV["HOME"]}/.cloudfoundry_deployment_target"), "rb")
-        cf_local_dep = JSON.parse!(file.read)
-        cf_home = cf_local_dep['cloudfoundry_home']
-        local_dep_name = cf_local_dep['deployment_name']
-        config_dir = "\#{cf_home}/.deployments/\#{local_dep_name}/config"
         public_ip = `wget -qO -  http://169.254.169.254/latest/meta-data/public-ipv4`
         local_ip = `wget -qO -  http://169.254.169.254/latest/meta-data/local-ipv4`
         instance_id = `wget -qO -  http://169.254.169.254/latest/meta-data/instance-id`
