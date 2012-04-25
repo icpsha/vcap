@@ -69,7 +69,7 @@ file node[:deployment][:cf_deployment_start] do
       require 'yaml'
       require 'uri'
       
-      file = File.open(File.expand_path("\#{ENV["HOME"]}/.cloudfoundry_deployment_target"), "rb")
+      file = File.open(File.expand_path("#{ENV["HOME"]}/.cloudfoundry_deployment_target"), "rb")
       cf_local_dep = JSON.parse!(file.read)
       cf_home = cf_local_dep['cloudfoundry_home']
       local_dep_name = cf_local_dep['deployment_name']
