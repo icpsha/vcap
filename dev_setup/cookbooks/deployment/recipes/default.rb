@@ -88,7 +88,7 @@ file node[:deployment][:cf_deployment_start] do
             content =""
             IO.foreach(filename) do |line|
               if line =~ /^\s*listen_addresses\s*=.*/
-               line = "listen_addresses='#{ip},localhost'#{$/}"
+               line = "listen_addresses='\#{ip},localhost'\#{$/}"
               end
               content.concat(line)              
             end    
