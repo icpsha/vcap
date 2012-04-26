@@ -68,7 +68,36 @@ file node[:deployment][:cf_deployment_start] do
       require 'json'
       require 'yaml'
       require 'uri'
+      require 'socket'
       
+      A_ROOT_SERVER = '198.41.0.4'
+      def cf_local_ip(route = A_ROOT_SERVER)
+        route ||= A_ROOT_SERVER
+        orig, Socket.do_not_reverse_lookup = Socket.do_not_reverse_lookup, true
+        UDPSocket.open {|s| s.connect(route, 1); s.addr.last }
+      ensure
+        Socket.do_not_reverse_lookup = orig
+      end
+      
+      def configurePostgresql(ip)
+        if !File.exist?('/etc/postgresql')
+          return
+        end
+        Dir.chdir('/etc/postgresql') do
+          Dir.glob(File.join("**","postgresql.conf")){|filename|
+            content =""
+            IO.foreach(filename) do |line|
+              if line =~ /^\s*listen_addresses\s*=.*/
+               line = "listen_addresses='#{ip},localhost'#{$/}"
+              end
+              content.concat(line)              
+            end    
+            File.open(filename, 'w') {|f| f.write(content) }
+            return
+          }
+        end  
+      end
+      sleep 5 # Make sure the networking is enabled
       file = File.open(File.expand_path("#{ENV["HOME"]}/.cloudfoundry_deployment_target"), "rb")
       cf_local_dep = JSON.parse!(file.read)
       cf_home = cf_local_dep['cloudfoundry_home']
@@ -79,67 +108,72 @@ file node[:deployment][:cf_deployment_start] do
         local_ip = `wget -qO -  http://169.254.169.254/latest/meta-data/local-ipv4`
         instance_id = `wget -qO -  http://169.254.169.254/latest/meta-data/instance-id`
         user_data = JSON.parse(`wget -qO -  http://169.254.169.254/latest/user-data`)
-        Dir.chdir(config_dir) do
-          Dir.glob("*.yml").each{|file|
-            comp_config = YAML.load(File.read(file))
-            comp_config['instance_id'] = instance_id
-            if !user_data['landscapeid'].nil?
-             comp_config['landscape_id'] = user_data['landscapeid']
-            end
-            if !user_data['landscape.val.dea_image'].nil?
-             comp_config['dea_image'] = user_data['landscape.val.dea_image']
-            end
-            
-            if !user_data['landscape.val.main_image'].nil?
-             comp_config['main_image'] = user_data['landscape.val.main_image']
-            end
-            
-            if !user_data['landscape.val.router_image'].nil?
-             comp_config['router_image'] = user_data['landscape.val.router_image']
-            end
-            if !user_data['landscape.val.provider_uri'].nil?
-             comp_config['provider_uri'] = user_data['landscape.val.provider_uri']
-            end
-            if !user_data['loadbalancer_name'].nil? && !comp_config['loadbalancer'].nil?             
-             comp_config['loadbalancer'] = user_data['loadbalancer_name']
-            end
-            if !comp_config['local_route'].nil?
-              comp_config['local_route'] = local_ip
-            end
-            if !comp_config['ip_route'].nil?
-              comp_config['ip_route'] = local_ip
-            end
-            mbus = URI.parse(comp_config['mbus'])
-            puts mbus
-            if !mbus.nil? && !user_data.nil? && !user_data['landscape.ref.Main'].nil?
-            #  mbus.host = user_data['message_bus']['host']
-            #  mbus.port = user_data['message_bus']['port'].to_i
-               mbus.host = user_data['landscape.ref.Main']
-               mbus.port = 4222
-               comp_config['mbus'] = "\#{mbus}"
-            elsif !mbus.nil?
-              mbus.host = 'localhost'
-              mbus.port = 4222
-              comp_config['mbus'] = "\#{mbus}"
-            end
-            database_environment = comp_config['database_environment']
-            if database_environment
-              env = comp_config['rails_environment'] || 'production'
-              if user_data['landscape.ref.CCDB']
-                database_environment[env]['host'] = user_data['landscape.ref.CCDB'] 
-              else
-                database_environment[env]['host'] = 'localhost'
-              end           
-            end
-            
-            File.open(file,'w+') {|out|
-              YAML.dump(comp_config,out)
-            }
-          }
-        end
       rescue
-        $stderr.puts "Unable to fetch user data. Leaving the configuration as it is.. Are you running on EC2 cloud?"
+        public_ip = local_ip = cf_local_ip
+        instance_id = 'local'
+        user_data = {:landscapeid => 'local'}
+        $stderr.puts "Unable to fetch user data. Are you running on EC2 cloud?"  
       end
+      configurePostgresql(local_ip)
+      Dir.chdir(config_dir) do
+        Dir.glob("*.yml").each{|file|
+          comp_config = YAML.load(File.read(file))
+          comp_config['instance_id'] = instance_id
+          if !user_data['landscapeid'].nil?
+           comp_config['landscape_id'] = user_data['landscapeid']
+          end
+          if !user_data['landscape.val.dea_image'].nil?
+           comp_config['dea_image'] = user_data['landscape.val.dea_image']
+          end
+          
+          if !user_data['landscape.val.main_image'].nil?
+           comp_config['main_image'] = user_data['landscape.val.main_image']
+          end
+          
+          if !user_data['landscape.val.router_image'].nil?
+           comp_config['router_image'] = user_data['landscape.val.router_image']
+          end
+          if !user_data['landscape.val.provider_uri'].nil?
+           comp_config['provider_uri'] = user_data['landscape.val.provider_uri']
+          end
+          if !user_data['loadbalancer_name'].nil? && !comp_config['loadbalancer'].nil?             
+           comp_config['loadbalancer'] = user_data['loadbalancer_name']
+          end
+          if !comp_config['local_route'].nil?
+            comp_config['local_route'] = local_ip
+          end
+          if !comp_config['ip_route'].nil?
+            comp_config['ip_route'] = local_ip
+          end
+          mbus = URI.parse(comp_config['mbus'])
+          puts mbus
+          if !mbus.nil? && !user_data.nil? && !user_data['landscape.ref.Main'].nil?
+          #  mbus.host = user_data['message_bus']['host']
+          #  mbus.port = user_data['message_bus']['port'].to_i
+             mbus.host = user_data['landscape.ref.Main']
+             mbus.port = 4222
+             comp_config['mbus'] = "\#{mbus}"
+          elsif !mbus.nil?
+            mbus.host = 'localhost'
+            mbus.port = 4222
+            comp_config['mbus'] = "\#{mbus}"
+          end
+          database_environment = comp_config['database_environment']
+          if database_environment
+            env = comp_config['rails_environment'] || 'production'
+            if user_data['landscape.ref.CCDB']
+              database_environment[env]['host'] = user_data['landscape.ref.CCDB'] 
+            else
+              database_environment[env]['host'] = 'localhost'
+            end           
+          end
+          
+          File.open(file,'w+') {|out|
+            YAML.dump(comp_config,out)
+          }
+        }
+      end
+      
       #Special handling for nats config (Let it listen on all ports by default)
       if File.exists?(File.join(config_dir,"nats_server","nats_server.yml"))
         comp_config = YAML.load(File.read("\#{config_dir}/nats_server/nats_server.yml"))
@@ -149,7 +183,6 @@ file node[:deployment][:cf_deployment_start] do
          }
       end
       exec("sudo \#{cf_home}/vcap/dev_setup/bin/vcap_dev -d \#{cf_home} -n \#{local_dep_name} start")
-
   EOH
 end
 file node[:deployment][:sample_rc_local] do
