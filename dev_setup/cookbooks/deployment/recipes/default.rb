@@ -88,7 +88,7 @@ file node[:deployment][:cf_deployment_start] do
             content =""
             IO.foreach(filename) do |line|
               if line =~ /^\s*listen_addresses\s*=.*/
-               line = "listen_addresses='\#{ip},localhost'\#{$/}"
+               line = "listen_addresses = '\#{ip},localhost'\#{$/}"
               end
               content.concat(line)              
             end    
@@ -97,7 +97,7 @@ file node[:deployment][:cf_deployment_start] do
           }
         end  
       end
-      sleep 5 # Make sure the networking is enabled
+      
       file = File.open(File.expand_path("#{ENV["HOME"]}/.cloudfoundry_deployment_target"), "rb")
       cf_local_dep = JSON.parse!(file.read)
       cf_home = cf_local_dep['cloudfoundry_home']
