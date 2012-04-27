@@ -84,7 +84,7 @@ module AppConnection
     return unless @parser
     latency = ((Time.now - @start_time) * 1000).to_i
     if @droplet &&( Router.send_metrics == 'always' || (Router.send_metrics == 'only_if_threshold' && (latency/1000).to_i > Router.response_threshold))
-      metrics_message = { :host => @droplet[:host], :port => @droplet[:port],:request_path => @req_path, :latency_ms=> latency }.to_json
+      metrics_message = { :host => @droplet[:host], :port => @droplet[:port],:request_path => @req_path, :latency_ms=> latency ,:timeout=> false}.to_json
       NATS.publish('router.metrics',metrics_message);
       Router.log.info "Published router.metrics = > #{metrics_message}"
     end   
@@ -177,7 +177,7 @@ module AppConnection
 
   def unbind
     if !@served && @droplet 
-      timeout_message = { :host => @droplet[:host], :port => @droplet[:port],:request_path => @req_path, :latency_ms=> ((Time.now - @start_time) * 1000).to_i }.to_json
+      timeout_message = { :host => @droplet[:host], :port => @droplet[:port],:request_path => @req_path, :latency_ms=> ((Time.now - @start_time) * 1000).to_i,:timeout=> true }.to_json
       NATS.publish('router.timeout',timeout_message);
       Router.log.info "Published router.timeout = > #{timeout_message}"
     end

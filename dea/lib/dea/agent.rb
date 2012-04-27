@@ -1315,7 +1315,12 @@ module DEA
       @logger.debug("Sent dea.stopped #{msg}")
     end
    def send_engagement_message()
+     drop_array = Array.new     
+     @droplets.each_key {|dropid|
+       drop_array.push(dropid)
+     }
       msg = {
+        :droplets => drop_array,
         :instance_id =>  @config['instance_id'],
         :instance_ip => @local_ip,
       }
