@@ -6,30 +6,33 @@ local_db: jdbc:postgresql://localhost:5432/cloud_controller
 loadbalancer: lbalancer
 cloud_controller_db: jdbc:postgresql://localhost:5432/cloud_controller
 cloud_name: Titanium
+platform_name: Cloud Foundry
 dea_image: <%= node[:cd][:dea_image]%>
 router_image: <%= node[:cd][:router_image]%>
 main_image: <%= node[:cd][:main_image]%>
 provider_uri: <%= node[:cd][:provider_uri]%>
 username: Administrator
 password: abcd1234
-scale_up_limit: 0.4
-scale_down_limit: -0.6
-smart_kill_min: 15
-low_cpu_limit: 30
-high_cpu_limit: 85
-scale_up_magnitude: 1
-scale_down_magnitude: -1
-max_num_instances: 10
-monitoring_interval_sec: 5000
-aggregation_interval_sec: 30000
-autoscaling_interval_sec: 120000
-aggregation_delay_sec: 32000
-autoscaling_delay_sec: 125000
-sleep_period_min: 15
 db_user: root
 db_password: changeme
 server_size: m1.small
-scale_up_switch: true
+
+smart_kill_min: 15
+
+scale_up_magnitude: 1
+scale_down_magnitude: -1
+
+monitoring_interval_sec: 5000
+autoscaling_interval_sec: 120000
+sleep_period_min: 15
+
+scale_up_switch: false
 scale_down_switch: false
 dea_collection: false
-platform_name: Cloud Foundry
+
+low_cpu_limit: 30
+high_cpu_limit: 85
+latency_upper_limit: 25
+latency_under_limit: 10
+autoscaling_type: latency
+dropped_req_limit: 5
