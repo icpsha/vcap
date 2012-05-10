@@ -1317,7 +1317,7 @@ module DEA
    def send_engagement_message()
      drop_array = Array.new     
      @droplets.each_key {|dropid|
-       drop_array.push(dropid)
+       drop_array.push(dropid.to_s)
      }
       msg = {
         :droplets => drop_array,
