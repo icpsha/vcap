@@ -67,7 +67,7 @@ beginning and towards the end. The entire process takes ~1 hour, so just
 keep a loose eye on it.
 
      sudo apt-get install curl
-     bash < <(curl -s -k -B https://raw.github.com/icpsha/vcap/master/setup/install)
+     bash < <(curl -s -k -B https://raw.github.com/paloaltocp/vcap/master/setup/install)
 
 _**Experimental**_ Or, instead of the above steps, try the new Chef based
 installation.  Note: the Chef based setup will eventually replace the
@@ -77,7 +77,7 @@ isn't supported yet, but it will soon.  At that point, the vcap_setup based
 installer will be removed from the source tree.
 
      sudo apt-get install curl
-     bash < <(curl -s -k -B https://raw.github.com/icpsha/vcap/master/dev_setup/bin/vcap_dev_setup)
+     bash < <(curl -s -k -B https://raw.github.com/paloaltocp/vcap/master/dev_setup/bin/vcap_dev_setup)
 
 NOTE: The automated setup does not auto-start the system. Once you are
 done with the setup, exit your current shell, restart a new shell and continue

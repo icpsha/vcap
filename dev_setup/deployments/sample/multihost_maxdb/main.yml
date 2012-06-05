@@ -9,5 +9,4 @@ jobs:
           - maxdb
     - health_manager
     - ccdb
-    - maxdb_gateway
-    - cloud_director
+    - maxdb_gateway    

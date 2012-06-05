@@ -12,7 +12,6 @@ class JobManager
   NATS = "nats_server"
   ROUTER = "router"
   CC = "cloud_controller"
-  CD = "cloud_director"
   CCDB = "ccdb"
   CF = "cloudfoundry"
   HM = "health_manager"
@@ -31,8 +30,8 @@ class JobManager
   end
 
   # All supported jobs
-  JOBS = [SAPALL,ALL, NATS, ROUTER, CF, CC, HM, DEA, CCDB,CD] + SERVICES_NODE + SERVICES_GATEWAY
-  SAPJOBS = [ NATS, ROUTER, CF, CC, HM, DEA, CCDB,CD] + ["maxdb_node", "maxdb_gateway"]
+  JOBS = [SAPALL,ALL, NATS, ROUTER, CF, CC, HM, DEA, CCDB] + SERVICES_NODE + SERVICES_GATEWAY
+  SAPJOBS = [ NATS, ROUTER, CF, CC, HM, DEA, CCDB] + ["maxdb_node", "maxdb_gateway"]
   SYSTEM_JOB = [CF]
 
   # List of the required properties for jobs
@@ -52,7 +51,7 @@ class JobManager
     SERVICE_GATEWAY_RUN_COMPONENTS[gateway] = gateway
   end
 
-  RUN_COMPONENTS = {ROUTER => ROUTER, CC => CC, HM => HM, CD => CD, DEA => DEA}.update(SERVICE_NODE_RUN_COMPONENTS).update(SERVICE_GATEWAY_RUN_COMPONENTS)
+  RUN_COMPONENTS = {ROUTER => ROUTER, CC => CC, HM => HM, DEA => DEA}.update(SERVICE_NODE_RUN_COMPONENTS).update(SERVICE_GATEWAY_RUN_COMPONENTS)
 
   class << self
     if defined?(Rake::DSL)

@@ -1,4 +1,0 @@
-#!/usr/bin/env ruby
-
-
-exec(File.expand_path("../../cloud_director/bin/cloud_director", __FILE__), *ARGV)

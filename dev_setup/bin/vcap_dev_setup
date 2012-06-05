@@ -69,7 +69,7 @@ if [ -z "$CLOUDFOUNDRY_DOMAIN" ]; then
 fi
 
 if [ -z "$VCAP_REPO" ]; then
-  VCAP_REPO=https://github.com/icpsha/vcap.git
+  VCAP_REPO=https://github.com/paloaltocp/vcap.git
 fi
 
 if [ -z "$VCAP_REPO_BRANCH" ]; then

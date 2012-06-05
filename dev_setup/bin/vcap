@@ -413,7 +413,7 @@ module Run
   private
 
   def self.core
-    %w(router cloud_controller dea health_manager cloud_director)
+    %w(router cloud_controller dea health_manager)
   end
 
   def self.services
