@@ -84,6 +84,10 @@ module DEA
       @snapshot_scheduled = false
       @disable_dir_cleanup = config['disable_dir_cleanup']
 
+      @monitoring_results=Hash.new                      #SAP a hash to keep monitoring info before aggregation
+      @metrics=Hash.new                                 #SAP a hash to keep router metrics info before aggregation
+
+
       @downloads_pending = {}
 
       @shutting_down = false
@@ -131,6 +135,9 @@ module DEA
 
       @nats_uri = config['mbus']
       @heartbeat_interval = config['intervals']['heartbeat']
+      @monitoring_interval = config['intervals']['monitoring']			#SAP interval for monitoring
+      @monitoringbeat_interval = config['intervals']['monitoringbeat']		#SAP interval for sending monitoring beat
+      @routerbeat_interval = config['intervals']['routermetricbeat']		#SAP interval for sending router metrics beat
 
       # XXX(mjp) - Ugh, this is needed for VCAP::Component.register(). Find a better solution when time permits.
       @config = config.dup()
@@ -247,10 +254,16 @@ module DEA
         NATS.subscribe("dea.#{uuid}.start") { |msg| process_dea_start(msg) }
         NATS.subscribe('router.start') {  |msg| process_router_start(msg) }
         NATS.subscribe('healthmanager.start') { |msg| process_healthmanager_start(msg) }
+        NATS.subscribe('router.metrics') { |msg| process_router_metrics(msg) }	#SAP subscribing to metrics messages from routers
 
         # Recover existing application state.
         recover_existing_droplets
         delete_untracked_instance_dirs
+
+        EM.add_periodic_timer(@routerbeat_interval) { send_routermetrics_beat }	#SAP send metrics messages on a timely fashion
+	EM.add_periodic_timer(@monitoring_interval) {monitor_itself}		#SAP monitoring itself on a regular basis
+	EM.add_periodic_timer(@monitoringbeat_interval) {send_monitoring_beat}  #SAP sending monitoring beats on a regular basis
+
 
         EM.add_periodic_timer(@heartbeat_interval) { send_heartbeat }
         EM.add_timer(MONITOR_INTERVAL) { monitor_apps }
@@ -260,6 +273,97 @@ module DEA
         NATS.publish('dea.start', @hello_message_json)
         send_started_message
       end
+    end
+
+
+    def monitor_itself			#SAP monitors itself and saves result for each running application instance 
+	return if @shutting_down || @droplets.empty?
+        @droplets.each_value do |instances|
+	  instances.each_value do |instance|
+	     if instance[:state] == :RUNNING            
+	      response = {
+              :droplet => instance[:droplet_id],
+              :index => instance[:instance_index]
+	      }
+	      response[:usage]=@usage[instance[:pid]].last if @usage[instance[:pid]]
+	      store_monitoring_result(response)	
+	     end
+	end
+       end
+    end
+										#SAP groups saved monitoring results
+    def store_monitoring_result(response)
+	return unless response.has_key? :usage
+	key="#{response[:droplet]}"+"#{response[:index]}"
+	cpu=response[:usage][:cpu]
+	mem=response[:usage][:mem]
+        disk=response[:usage][:disk]
+	if @monitoring_results.has_key?(key)
+	    old=@monitoring_results[key]
+	    @monitoring_results[key]={:app_id =>old[:app_id],:index =>old[:index],:cpu => (old[:cpu]+cpu).round(2),
+					:mem =>old[:mem]+mem,:disk => old[:disk]+disk, :count=>old[:count]+1}	
+	else
+	   @monitoring_results[key]={:app_id =>response[:droplet],:index =>response[:index],
+				     :cpu =>cpu.round(2),:mem =>mem,:disk =>disk,:count =>1}	
+	end
+    end
+
+    def send_monitoring_beat                                         #SAP aggregates and sends monitoring result of each running 
+ 	@monitoring_results.each_value do |result|		     #application instance to cloud controller
+	  message={
+		:app_id =>result[:app_id],
+		:instance_index =>result[:index],
+		:cpu => (result[:cpu]/result[:count]).round(2),
+		:mem => (result[:mem]/1028/result[:count]).round(2), 
+		:disk => (result[:disk]/1028/result[:count]).round(2)
+		}  
+	  NATS.publish('dea.monitoringbeat', message.to_json)
+	end
+	@monitoring_results.clear
+    end
+	
+    def process_router_metrics(msg)					#SAP maps router metrics message to a certain application
+	return unless msg[:host] == @local_ip
+	@droplets.each_value do |instances|
+	   instances.each_value do |instance|
+	     next unless instance[:port] == msg[:port]
+	     metric={:app_id => instance[:droplet], :latency => msg[:latency_ms], :timeout => msg[:timeout]}
+	   end
+	end
+	store_router_metrics(metric)
+    end
+
+    def store_router_metrics(metric)					#SAP group router metrics messages, hash by app_id
+	if @metrics.has_key?(metric[:app_id])
+	   old=@metrics[metric[:app_id]]
+	   if(metric[:timeout] == "true")
+		new={:app_id =>metric[:app_id], :latency=>old[:latency]+metric[:latency], 
+ 		     :timeout_counter=>old[:timeout_counter]+1,:counter=>old[:counter]+1}
+	   else
+		new={:app_id =>metric[:app_id], :latency=>old[:latency]+metric[:latency], 
+				      :timeout_counter=>old[:timeout_counter],:counter=>old[:counter]+1}
+	   end
+	   @metrics[metric[:app_id]]=new
+	else
+	   if(metric[:timeout] == "true")
+		new={:app_id =>metric[:app_id], :latency=>metric[:latency], :timeout_counter=>1,:counter=>1}
+	   else
+		new={:app_id =>metric[:app_id], :latency=>metric[:latency], :timeout_counter=>0,:counter=>1}
+	   end
+	   @metrics[metric[:app_id]]=new
+        end		
+    end
+
+    def send_routermetrics_beat			#SAP sends a single message to cloud controller for each router metric group
+	@metrics.each_value do |metric|
+	  message={
+		:app_id =>metric[:app_id],
+		:avg_latency =>metric[:latency]/metric[:counter],
+		:timeout =>metric[:timeout_counter]
+		}  
+	  NATS.publish('dea.routermetricbeat', message.to_json)	
+	end
+	@metrics.clear
     end
 
     def send_heartbeat

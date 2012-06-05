@@ -10,6 +10,9 @@ class App < ActiveRecord::Base
   has_many :service_configs, :through => :service_bindings
   has_many :routes, :dependent => :destroy
 
+  has_many :system_metrics, :dependent => :destroy  #SAP destroy related system metrics when application gets removed
+  has_many :user_metrics, :dependent => :destroy  #SAP destroy related user metrics when application gets removed 
+
   before_validation :normalize_legacy_staging_strings!
 
   serialize :metadata, Hash

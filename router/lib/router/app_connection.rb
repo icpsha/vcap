@@ -178,7 +178,7 @@ module AppConnection
   def unbind
     if !@served && @droplet 
       timeout_message = { :host => @droplet[:host], :port => @droplet[:port],:request_path => @req_path, :latency_ms=> ((Time.now - @start_time) * 1000).to_i,:timeout=> true }.to_json
-      NATS.publish('router.timeout',timeout_message);
+      NATS.publish('router.metrics',timeout_message);
       Router.log.info "Published router.timeout = > #{timeout_message}"
     end
     Router.outstanding_request_count -= @outstanding_requests
