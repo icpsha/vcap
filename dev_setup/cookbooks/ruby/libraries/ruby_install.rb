@@ -26,7 +26,7 @@ module RubyInstall
       cwd File.join("", "tmp")
       user node[:deployment][:user]
       code <<-EOH
-      tar xzf ruby-#{ruby_version}.tar.gz
+      tar xf ruby-#{ruby_version}.tar.gz
       cd ruby-#{ruby_version}
       ./configure --disable-pthread --prefix=#{ruby_path}
       make
