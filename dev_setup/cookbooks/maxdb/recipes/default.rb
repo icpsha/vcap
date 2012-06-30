@@ -9,10 +9,12 @@ case node['platform']
   
 when "ubuntu"
   arch = node['kernel']['machine'] =~ /x86_64/ ? "x86_64" : "i386"
-  src = "https://sapmats-us.sap-ag.de/download/download.cgi?id=JFB1N77ZFZM7KZGOOA5S1PED4JIIIKTINNR3FTHFIV6341KG91&contype=application/x-gzip-compressed&password="
+  #src = "https://sapmats-us.sap-ag.de/download/download.cgi?id=JFB1N77ZFZM7KZGOOA5S1PED4JIIIKTINNR3FTHFIV6341KG91&contype=application/x-gzip-compressed&password="
+   src = "https://sapmats-us.sap-ag.de/download/download.cgi?id=CBLZCMZWLIX3A3MOY2TPKF6DRY2T12IGGGN5M9UKBGP4ESDNUR&contype=application/x-gzip-compressed&password="
   folder = "maxdb-all-linux-64bit-x86_64-7_8_02_27"
   if arch == "i386"
-    src = "https://sapmats-us.sap-ag.de/download/download.cgi?id=QHSPQ46BM366EYMP9UZ3FNO2T4PH2I6BRJFJLK8WOSEOPQLPYB&contype=application/x-gzip-compressed&password="
+   # src = "https://sapmats-us.sap-ag.de/download/download.cgi?id=QHSPQ46BM366EYMP9UZ3FNO2T4PH2I6BRJFJLK8WOSEOPQLPYB&contype=application/x-gzip-compressed&password="
+    src = "https://sapmats-us.sap-ag.de/download/download.cgi?id=NSWED95RS9CYWDPON84Q0AVNUILKIEOU9SJR5AXMU0UVBMK4MR&contype=application/x-gzip-compressed&password="
     folder = "maxdb-all-linux-32bit-i386-7_8_02_27"
     bash "Install dependencies" do
       user "root"
